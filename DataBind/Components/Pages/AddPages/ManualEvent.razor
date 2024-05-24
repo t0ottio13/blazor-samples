@@ -1,0 +1,30 @@
+﻿@page "/manualevent"
+@implements IDisposable
+@using System.Timers
+
+<h3>StateHasChanged</h3>
+<p>現在時刻：　@DateTime.Now</p>
+<p>カウンター：@currentCount</p>
+
+@code {
+    int currentCount = 0;
+
+    private Timer timer = new Timer(100);
+    protected override void OnInitialized()
+    {
+        timer.Elapsed += (s, e) =>
+        {
+            InvokeAsync(() =>
+            {
+                currentCount++;
+                StateHasChanged();
+            });
+        };
+        timer.Start();
+    }
+
+    public void Dispose()
+    {
+        timer.Dispose();
+    }
+}

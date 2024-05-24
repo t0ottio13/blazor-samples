@@ -1,0 +1,22 @@
+﻿@page "/databinding"
+
+<h3>DataBinding</h3>
+
+<div>
+    <p class="fw-bold">データバインディング</p>
+    <input tyepe="text" @bind-value="Name" placepholder="Enter your name" />
+    <button @onclick="btnGetMessage_Click">Get Message</button>
+    <p>@Message</p>
+</div>
+@code {
+    // データバインディング
+    // 双方向バインド
+    private string Name { get; set; } = "";
+    // 単方向バインド
+    private string Message { get; set; } = "";
+
+    private void btnGetMessage_Click()
+    {
+        Message = "Hello " + Name + " !";
+    }
+}

@@ -1,0 +1,48 @@
+﻿@page "/eventhandler"
+
+<h3>EventHandler</h3>
+
+<div>
+    <p class="fw-bold">イベントハンドラ</p>
+    <button @onclick="btnGetMessage1_click">基本</button>
+    <button @onclick="e => btnGetMessage2_click(e)">マウスイベントShift</button>
+    <button @onclick="btnGetMessage3_click">非同期(3秒遅延)</button>
+
+    <button @onclick="@(() => Message = DateTime.Now.ToString())">ラムダ式インライン1</button>
+    <button @onclick="@((e) => Message = DateTime.Now.ToString())">ラムダ式インライン2</button>
+    <p>メッセージ：@Message</p>
+</div>
+
+@code {
+    private string Message { get; set; } = "";
+
+    private void btnGetMessage1_click()
+    {
+        Message = "Hello, world!" + DateTime.Now;
+    }
+
+    private void btnGetMessage2_click(MouseEventArgs e)
+    {
+        Message = "Hello, world!" + DateTime.Now + e.ShiftKey;
+    }
+
+    private async Task btnGetMessage3_click()
+    {
+        await Task.Delay(3000);
+        Message = "Hello, world!" + DateTime.Now;
+    }
+}
+
+<button @onclick='() => btnGetMessage_Click("Hello World1")'>Get Message1</button>
+<button @onclick='() => btnGetMessage_Click("Hello World2")'>Get Message2</button>
+<button @onclick='() => btnGetMessage_Click("Hello World3")'>Get Message3</button>
+
+<p>メッセージ２： @Message2</p>
+
+@code{
+    private string Message2 { get; set;} = "";
+
+    private void btnGetMessage_Click(string message){
+        Message2 = message;
+    }
+}
