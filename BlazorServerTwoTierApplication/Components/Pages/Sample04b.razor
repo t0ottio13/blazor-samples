@@ -1,0 +1,56 @@
+﻿@page "/Sample04b"
+
+@using BlazorServerTwoTierApplication.Data
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject IDbContextFactory<PubsDbContext> DbFactory
+
+<h3>Sample04b: ページング</h3>
+
+@if (ItemsProvider == null)
+{
+    <div>データロード中</div>
+}
+else
+{
+    <div class="grid" tabindex="-1">
+        <QuickGrid ItemsProvider="@ItemsProvider" Virtualize="true" ItemSize="5">
+            <PropertyColumn Property="@(a => a.AuthorId)" Title="著者ID" Sortable="true" />
+            <TemplateColumn Title="著者名"
+                            Sortable="true"
+                            SortBy="@(GridSort<Author>.ByAscending(a => a.AuthorFirstName).ThenAscending(a => a.AuthorLastName))">
+                @(context.AuthorFirstName) @(context.AuthorLastName)
+            </TemplateColumn>
+            <PropertyColumn Property="@(a => a.Phone)" Title="電話番後" />
+            <PropertyColumn Property="@(a => a.State)" Title="州" />
+            <TemplateColumn Title="契約有無">
+                @(context.Contract ? "契約あり" : "契約なし")
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+}
+
+@code {
+    private GridItemsProvider<Author>? ItemsProvider {get; set; }
+
+    private string? LogMessage { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ItemsProvider = async request =>
+        {
+            LogMessage += $"( {request.StartIndex} {request.Count})";
+            StateHasChanged();
+
+            await using (var pubs = await DbFactory.CreateDbContextAsync())
+            {
+                var data = await pubs.Authors.Skip(request.StartIndex)
+                    .Take(request.Count ?? 0)
+                    .ToListAsync();
+                var totalCount = await pubs.Authors.CountAsync();
+                return GridItemsProviderResult.From(data, totalCount);
+            }
+        };
+    }
+}
