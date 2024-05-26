@@ -1,10 +1,25 @@
 using BlazorServerTwoTierApplication.Components;
+using BlazorServerTwoTierApplication.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddDbContextFactory<PubsDbContext>(options =>
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        options = options.EnableSensitiveDataLogging().EnableDetailedErrors();
+    }
+    options.UseSqlServer(builder.Configuration.GetConnectionString("PubsDBContext"),
+        providerOption =>
+        {
+            providerOption.EnableRetryOnFailure();
+        });
+});
 
 var app = builder.Build();
 
