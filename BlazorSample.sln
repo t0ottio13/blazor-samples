@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataBind", "DataBind\DataBi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorServerTwoTierApplication", "BlazorServerTwoTierApplication\BlazorServerTwoTierApplication.csproj", "{DC868B26-CB21-4A7A-8A21-7EB281645B24}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickGrid", "QuickGrid\QuickGrid.csproj", "{03701E7C-0601-42C7-B213-3E8FA9DB0CB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{DC868B26-CB21-4A7A-8A21-7EB281645B24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC868B26-CB21-4A7A-8A21-7EB281645B24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC868B26-CB21-4A7A-8A21-7EB281645B24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03701E7C-0601-42C7-B213-3E8FA9DB0CB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03701E7C-0601-42C7-B213-3E8FA9DB0CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03701E7C-0601-42C7-B213-3E8FA9DB0CB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03701E7C-0601-42C7-B213-3E8FA9DB0CB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
