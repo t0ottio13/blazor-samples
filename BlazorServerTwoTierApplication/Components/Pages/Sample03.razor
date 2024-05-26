@@ -1,0 +1,71 @@
+﻿@page "/Sample03"
+
+@using BlazorServerTwoTierApplication.Data
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject IDbContextFactory<PubsDbContext> DbFactory
+
+<h3>Sample03: ソート</h3>
+
+<p>※うまくソートが機能しない</p>
+
+@if (authors == null)
+{
+    <div>データロード中</div>
+}
+else
+{
+    <div>
+        <QuickGrid Items="@authors">
+            <PropertyColumn Property="@(a => a.AuthorId)" Title="著者ID" Sortable="true" />
+            <TemplateColumn Title="著者名"
+                            Sortable="true"
+                            SortBy="@(GridSort<Author>.ByAscending(a => a.AuthorFirstName).ThenAscending(a => a.AuthorLastName))">
+                @(context.AuthorFirstName) @(context.AuthorLastName)
+            </TemplateColumn>
+            <PropertyColumn Property="@(a => a.Phone)" Title="電話番後" />
+            <PropertyColumn Property="@(a => a.State)" Title="州" />
+            <TemplateColumn Title="契約有無">
+                @(context.Contract ? "契約あり" : "契約なし")
+            </TemplateColumn>
+        </QuickGrid>
+    </div>
+}
+
+@code {
+    private IQueryable<Author>? authors = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using (var pubs = await DbFactory.CreateDbContextAsync())
+        {
+            authors = (await pubs.Authors.ToListAsync()).AsQueryable();
+        }
+    }
+}
+
+// https://aspnet.github.io/quickgridsamples/getstarted
+<PageTitle>Promotion Grid</PageTitle>
+
+<h1>Promotion Grid Example</h1>
+
+<QuickGrid Items="@people">
+    <PropertyColumn Property="@(p => p.PersonId)" Sortable="true" />
+    <PropertyColumn Property="@(p => p.Name)" Sortable="true" />
+    <PropertyColumn Property="@(p => p.PromotionDate)" Format="yyyy-MM-dd" Sortable="true" />
+</QuickGrid>
+
+@code {
+    private record Person(int PersonId, string Name, DateOnly PromotionDate);
+
+    private IQueryable<Person> people = new[]
+    {
+        new Person(10895, "Jean Martin", new DateOnly(1985, 3, 16)),
+        new Person(10944, "António Langa", new DateOnly(1991, 12, 1)),
+        new Person(11203, "Julie Smith", new DateOnly(1958, 10, 10)),
+        new Person(11205, "Nur Sari", new DateOnly(1922, 4, 27)),
+        new Person(11898, "Jose Hernandez", new DateOnly(2011, 5, 3)),
+        new Person(12130, "Kenji Sato", new DateOnly(2004, 1, 9)),
+    }.AsQueryable();
+}
