@@ -5,9 +5,14 @@ VisualStudioVersion = 17.9.34526.213
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataBind", "DataBind\DataBind.csproj", "{26EC542C-406A-4632-9774-BF673DA62375}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorServerTwoTierApplication", "BlazorServerTwoTierApplication\BlazorServerTwoTierApplication.csproj", "{DC868B26-CB21-4A7A-8A21-7EB281645B24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorServerTwoTierApplication", "BlazorServerTwoTierApplication\BlazorServerTwoTierApplication.csproj", "{DC868B26-CB21-4A7A-8A21-7EB281645B24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickGrid", "QuickGrid\QuickGrid.csproj", "{03701E7C-0601-42C7-B213-3E8FA9DB0CB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickGrid", "QuickGrid\QuickGrid.csproj", "{03701E7C-0601-42C7-B213-3E8FA9DB0CB9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{907B9B56-C9B0-4826-AF37-8087AA0B6FF1}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

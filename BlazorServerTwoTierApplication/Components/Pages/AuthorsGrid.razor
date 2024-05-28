@@ -1,0 +1,35 @@
+﻿@using BlazorServerTwoTierApplication.Data
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@if(this.Authors == null)
+{
+    <div>データロード中</div>
+}
+else
+{
+    <div>
+        <QuickGrid Items="@Authors" Pagination="@paginationState">
+            <PropertyColumn Property="@(a => a.AuthorId)" Title="著者ID" Sortable="true" />
+            <TemplateColumn Title="著者名"
+                            Sortable="true"
+                            SortBy="@(GridSort<Author>.ByAscending(a => a.AuthorFirstName).ThenAscending(a => a.AuthorLastName))">
+                @(context.AuthorFirstName) @(context.AuthorLastName)
+            </TemplateColumn>
+            <PropertyColumn Property="@(a => a.Phone)" Title="電話番後" />
+            <PropertyColumn Property="@(a => a.State)" Title="州" />
+            <TemplateColumn Title="契約有無">
+                @(context.Contract ? "契約あり" : "契約なし")
+            </TemplateColumn>
+        </QuickGrid>
+
+        <Paginator State="@paginationState" />
+    </div>
+}
+
+@code{
+    [Parameter]
+    public IQueryable<Author>? Authors { get; set; }
+
+    // こっちはメンバー変数
+    private readonly PaginationState paginationState = new() { ItemsPerPage = 10 };
+}
