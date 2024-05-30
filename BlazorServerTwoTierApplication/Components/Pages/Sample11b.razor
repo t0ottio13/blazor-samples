@@ -1,0 +1,155 @@
+﻿@page "/Sample11b/{AuthorId}"
+@using BlazorServerTwoTierApplication.Data
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using System.ComponentModel.DataAnnotations
+
+@inject IDbContextFactory<PubsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<h3>Sample11b : 楽観同時実行制御機能つきデータ更新</h3>
+
+
+<h5>著者データを修正してください。</h5>
+
+<EditForm Model="@vm" OnValidSubmit="@OnEditFormSubmitted">
+    <fieldset disabled="@isProcessing">
+        <DataAnnotationsValidator />
+
+        <dl>
+            <dt>著者 ID</dt>
+            <dd>@vm.AuthorId</dd>
+
+            <dt>著者名(名)</dt>
+            <dd><InputText @bind-Value="vm.AuthorFirstName" /></dd>
+
+            <dt>著者名(姓)</dt>
+            <dd><InputText @bind-Value="vm.AuthorLastName" /></dd>
+
+            <dt>電話番号</dt>
+            <dd><InputText @bind-Value="vm.Phone" /></dd>
+        </dl>
+
+        <button type="submit">更新</button>
+        <ValidationSummary />
+        <span>@concurrentUpdateErrorMessage</span>
+    </fieldset>
+    <button type="button" disabled="@cannotCancel" @onclick="OnCancelButtonClicked">キャンセル</button>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public string? AuthorId { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (String.IsNullOrEmpty(AuthorId)) throw new ArgumentException("AuthorId");
+        if (System.Text.RegularExpressions.Regex.IsMatch(AuthorId, @"^\d{3}-\d{2}-\d{4}$") == false)
+            throw new ArgumentException("AuthorId");
+    }
+
+    private string concurrentUpdateErrorMessage = "";
+    private EditViewModel vm = new EditViewModel();
+    private bool isProcessing = false;
+    private bool cannotCancel = false;
+    private Author? originalAuthor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Author? editAuthor = null;
+        await using (var pubs = await DbFactory.CreateDbContextAsync())
+        {
+            var query = from a in pubs.Authors
+                        where a.AuthorId == this.AuthorId
+                        select a;
+            editAuthor = await query.FirstOrDefaultAsync();
+        }
+
+        if (editAuthor == null) throw new InvalidOperationException(this.AuthorId);
+
+        // View に引き渡すデータを準備する
+        vm = new EditViewModel()
+            {
+                AuthorId = editAuthor.AuthorId,
+                AuthorFirstName = editAuthor.AuthorFirstName,
+                AuthorLastName = editAuthor.AuthorLastName,
+                Phone = editAuthor.Phone
+            };
+
+        // データ更新時に再利用する(楽観同時実行制御処理用)
+        originalAuthor = editAuthor;
+    }
+
+    private void OnCancelButtonClicked()
+    {
+        if (!cannotCancel)
+        {
+            NavigationManager.NavigateTo("Sample11");
+        }
+    }
+
+    private async Task OnEditFormSubmitted()
+    {
+        if (isProcessing) return;
+        isProcessing = true;
+        cannotCancel = true;
+
+        await using (PubsDbContext pubs = await DbFactory.CreateDbContextAsync())
+        {
+
+            Author target = originalAuthor!;
+
+            // 更新データで書き換える
+            target.AuthorFirstName = vm.AuthorFirstName;
+            target.AuthorLastName = vm.AuthorLastName;
+            target.Phone = vm.Phone;
+            pubs.Entry<Author>(target).State = EntityState.Modified;
+
+            try
+            {
+                await pubs.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // エラーメッセージを追加して画面に表示する
+                concurrentUpdateErrorMessage = "他のユーザがすでに当該データを更新しています。一度キャンセルして最初からやり直してください。";
+                cannotCancel = false; // キャンセル可能にフラグを戻す
+                return;
+            }
+        }
+
+        NavigationManager.NavigateTo("Sample11");
+    }
+
+    [CustomValidation(typeof(EditViewModel), "ValidateFullName")]
+    public class EditViewModel
+    {
+        // 入力対象でないフィールドにはデータアノテーションを付与する必要はない
+        [Display(Name = "著者ID")]
+        public string AuthorId { get; set; } = string.Empty;
+
+        [Display(Name = "著者名（名）")]
+        [Required(ErrorMessage = "著者名（名）は必須入力です。")]
+        [RegularExpression(@"^[\u0020-\u007e]{1,20}$", ErrorMessage = "著者名（名）は半角 20 文字以内で入力してください。")]
+        public string AuthorFirstName { get; set; } = string.Empty;
+
+        [Display(Name = "著者名（姓）")]
+        [Required(ErrorMessage = "著者名（姓）は必須入力です。")]
+        [RegularExpression(@"^[\u0020-\u007e]{1,40}$", ErrorMessage = "著者名（姓）は半角 40 文字以内で入力してください。")]
+        public string AuthorLastName { get; set; } = string.Empty;
+
+        [Display(Name = "電話番号")]
+        [Required(ErrorMessage = "電話番号は必須入力です。")]
+        [RegularExpression(@"^\d{3} \d{3}-\d{4}$", ErrorMessage = "電話番号は 012 345-6789 のように入力してください。")]
+        public string Phone { get; set; } = string.Empty;
+
+        // フォームレベルでの単体入力チェック項目に対するロジックなどを実装
+        public static ValidationResult ValidateFullName(EditViewModel vm, ValidationContext ctx)
+        {
+            if (vm.AuthorFirstName == "Nobuyuki" && vm.AuthorLastName == "Akama")
+                return new ValidationResult("Nobuyuki Akama という名前は予約済みのため登録できません。", new List<string>() { "AuthorFirstName", "AuthorLastName" });
+            return ValidationResult.Success!;
+        }
+    }
+}
