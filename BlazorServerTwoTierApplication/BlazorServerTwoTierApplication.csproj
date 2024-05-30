@@ -13,4 +13,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\Toshimasa Hashiguchi\source\repos\DotNet\blazor-sample\BlazorSample\BlazorServerTwoTierApplication\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\Toshimasa Hashiguchi\source\repos\DotNet\blazor-sample\BlazorSample\BlazorServerTwoTierApplication\.editorconfig" />
+  </ItemGroup>
+
 </Project>
